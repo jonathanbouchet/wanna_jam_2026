@@ -1,0 +1,10 @@
+[project]
+name = "wanna-jam-2026"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "raylib>=6.0.1.0",
+    "ruff>=0.16.3",
+]
