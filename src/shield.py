@@ -47,4 +47,27 @@ class Shield:
             # math.degrees(math.atan2(self.direction.y, self.direction.x)),
             self.color
         )
+        coords = self.get_rectangle()
+        pr.draw_line(int(coords[0].x), int(coords[0].y), int(coords[1].x), int(coords[1].y), pr.RED)
+        pr.draw_line(int(coords[1].x), int(coords[1].y), int(coords[2].x), int(coords[2].y), pr.RED)
+        pr.draw_line(int(coords[2].x), int(coords[2].y), int(coords[3].x), int(coords[3].y), pr.RED)
+        pr.draw_line(int(coords[3].x), int(coords[3].y), int(coords[0].x), int(coords[0].y), pr.RED)
 
+    def get_rectangle(self) -> list[pr.Vector2]:
+        center = pr.Vector2(
+            self.position.x, self.position.y
+        )
+        half = pr.Vector2(self.width / 2, self.height / 2)
+        tl = pr.Vector2(center.x - half.x, center.y - half.y)
+        tr = pr.Vector2(center.x + half.x, center.y - half.y)
+        br = pr.Vector2(center.x + half.x, center.y + half.y)
+        bl = pr.Vector2(center.x - half.x, center.y + half.y)
+
+        angle = self.rotation*180/math.pi#math.degrees(math.atan2(self.direction.y, self.direction.x))
+
+        tl = rotate_point(tl, center, angle)
+        tr = rotate_point(tr, center, angle)
+        br = rotate_point(br, center, angle)
+        bl = rotate_point(bl, center, angle)
+
+        return [tl, tr, br, bl]

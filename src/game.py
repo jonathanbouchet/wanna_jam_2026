@@ -1,5 +1,6 @@
 import asyncio
 import random
+import PolygonCollision
 
 import pyray as pr
 
@@ -36,6 +37,21 @@ class Game:
         )
         self.projectiles: list[Projectile] = []
 
+    def check_collisions_neutrons_shield(self) -> None:
+        for proj in self.projectiles:
+            proj_rect = proj.get_rectangle()
+            shield_rect = self.entity.get_shield().get_rectangle()
+            proj_polygon = PolygonCollision.shape.Shape(
+                vertices=[tuple([r.x, r.y]) for r in proj_rect]
+            )
+            shield_polygon = PolygonCollision.shape.Shape(
+                vertices=[tuple([r.x, r.y]) for r in shield_rect]
+            )
+            if proj_polygon.collide(shield_polygon):
+                print(f"COLLISION between :{proj_polygon} and {shield_polygon}")
+                proj.direction.x *= -1
+                proj.direction.y *= -1
+
     def check_collisions(self) -> None:
         for proj in self.projectiles:
             if pr.check_collision_circles(
@@ -56,7 +72,8 @@ class Game:
         dt = pr.get_frame_time()
 
         # check collisions
-        self.check_collisions()
+        # self.check_collisions()
+        self.check_collisions_neutrons_shield()
 
         # update entity
         self.entity.update(dt=dt)

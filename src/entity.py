@@ -29,6 +29,9 @@ class Entity:
             radius = 100
         )
 
+    def get_shield(self) -> Shield:
+        return self.shield
+
     def update(self, dt: float) -> None:
         self.shield.update(dt=dt)
         self.check_guard()
