@@ -1,13 +1,23 @@
 import pyray as pr
 
+
 class Projectile:
-    def __init__(self, position: pr.Vector2, radius: int, speed: int, direction: pr.Vector2, color: pr.Color, game_window: pr.Vector2) -> None:
+    def __init__(
+        self,
+        position: pr.Vector2,
+        radius: int,
+        speed: int,
+        direction: pr.Vector2,
+        color: pr.Color,
+        game_window: pr.Vector2,
+    ) -> None:
         self.position = position
         self.direction = direction
         self.speed = speed
         self.radius = radius
         self.color = color
-        self.game_window=game_window
+        self.game_window = game_window
+        self.is_disabled = False
 
     def move(self, dt: float) -> None:
         """
@@ -32,9 +42,7 @@ class Projectile:
         self.move(dt)
 
     def draw(self):
-        pr.draw_circle_v(
-            self.position, self.radius, self.color
-        )
+        pr.draw_circle_v(self.position, self.radius, self.color)
 
     def __str__(self) -> str:
         return f"speed: {self.speed}, radius: {self.radius}, color: {self.color}"

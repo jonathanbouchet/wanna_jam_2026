@@ -1,10 +1,13 @@
 import asyncio
-from src.game import Game
+
 import pyray as pr
+
+from src.game import Game
+
 
 async def main() -> None:
     game = Game(
-        width=600, height=600, fps_target=60, name="app", background_color=pr.BLACK
+        width=800, height=800, fps_target=60, name="app", background_color=pr.BLACK
     )
     game.init()
     await game.run()

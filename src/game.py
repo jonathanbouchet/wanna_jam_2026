@@ -1,6 +1,8 @@
 import asyncio
 import random
+
 import pyray as pr
+
 from src.entity import Entity
 from src.projectile import Projectile
 
@@ -23,12 +25,40 @@ class Game:
     def init(self):
         pr.init_window(self.width, self.height, self.name)
         pr.set_target_fps(self.fps_target)
-        self.entity = Entity(position=pr.Vector2(self.width//2, self.height//2), inner_radius= 50, outer_radius=70, inner_color=pr.RED, outer_color=pr.PINK)
+        self.entity = Entity(
+            position=pr.Vector2(self.width // 2, self.height // 2),
+            inner_radius=50,
+            outer_radius=70,
+            guard_inner_radius=300,
+            guard_outer_radius=305,
+            inner_color=pr.RED,
+            outer_color=pr.PINK,
+        )
         self.projectiles: list[Projectile] = []
+
+    def check_collisions(self) -> None:
+        for projectile in self.projectiles:
+            if pr.check_collision_circles(
+                self.entity.position,
+                self.entity.outer_radius,
+                projectile.position,
+                projectile.radius,
+            ):
+                print("collision")
+                self.entity.inner_radius += projectile.radius
+                self.entity.outer_radius += projectile.radius
+                projectile.is_disabled = True
+                break
+        self.projectiles = [x for x in self.projectiles if not x.is_disabled]
 
     def update(self) -> None:
         # input
         dt = pr.get_frame_time()
+
+        # check collisions
+        self.check_collisions()
+
+        # update projectiles
         _ = [r.update(dt) for r in self.projectiles]
 
     async def run(self) -> None:
@@ -44,10 +74,11 @@ class Game:
                         speed=random.randint(400, 600),  # random speed in [400, 600]
                         radius=random.randint(10, 15),  # random radius
                         color=pr.DARKGRAY,  # random color
-                        game_window=pr.Vector2(self.width, self.height)
+                        game_window=pr.Vector2(self.width, self.height),
                     )
                 )
                 print(self.projectiles[-1])
+
             self.update()
             self.draw()
             await asyncio.sleep(0)
@@ -57,9 +88,17 @@ class Game:
         pr.clear_background(self.background_color)
         self.entity.draw()
         _ = [r.draw() for r in self.projectiles]
-        pr.draw_fps(0,0)
-        pr.draw_line_v(pr.Vector2(0, self.height//2), pr.Vector2(self.width, self.height//2), pr.DARKGREEN)
-        pr.draw_line_v(pr.Vector2(self.width//2, 0), pr.Vector2(self.width//2, self.height), pr.DARKGREEN)
+        pr.draw_fps(0, 0)
+        pr.draw_line_v(
+            pr.Vector2(0, self.height // 2),
+            pr.Vector2(self.width, self.height // 2),
+            pr.DARKGREEN,
+        )
+        pr.draw_line_v(
+            pr.Vector2(self.width // 2, 0),
+            pr.Vector2(self.width // 2, self.height),
+            pr.DARKGREEN,
+        )
         pr.end_drawing()
 
     def end(self) -> None:
