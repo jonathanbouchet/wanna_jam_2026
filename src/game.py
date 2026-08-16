@@ -31,25 +31,25 @@ class Game:
             outer_radius=70,
             guard_inner_radius=300,
             guard_outer_radius=305,
-            inner_color=pr.RED,
-            outer_color=pr.PINK,
+            inner_color=pr.BLUE,
+            outer_color=pr.DARKBLUE,
         )
         self.projectiles: list[Projectile] = []
 
     def check_collisions(self) -> None:
-        for projectile in self.projectiles:
+        for proj in self.projectiles:
             if pr.check_collision_circles(
                 self.entity.position,
                 self.entity.outer_radius,
-                projectile.position,
-                projectile.radius,
+                proj.position,
+                proj.radius,
             ):
                 print("collision")
-                self.entity.inner_radius += projectile.radius
-                self.entity.outer_radius += projectile.radius
-                projectile.is_disabled = True
+                self.entity.inner_radius += proj.radius
+                self.entity.outer_radius += proj.radius
+                proj.is_disabled = True
                 break
-        self.projectiles = [x for x in self.projectiles if not x.is_disabled]
+        self.projectiles = [proj for proj in self.projectiles if not proj.is_disabled]
 
     def update(self) -> None:
         # input
@@ -58,8 +58,11 @@ class Game:
         # check collisions
         self.check_collisions()
 
+        # update entity
+        self.entity.update()
+
         # update projectiles
-        _ = [r.update(dt) for r in self.projectiles]
+        _ = [proj.update(dt) for proj in self.projectiles if not proj.is_disabled]
 
     async def run(self) -> None:
         while not pr.window_should_close():
@@ -87,8 +90,10 @@ class Game:
         pr.begin_drawing()
         pr.clear_background(self.background_color)
         self.entity.draw()
-        _ = [r.draw() for r in self.projectiles]
+        _ = [proj.draw() for proj in self.projectiles if not proj.is_disabled]
         pr.draw_fps(0, 0)
+        pr.draw_text(f"FRAME TIME: {int(1000*pr.get_frame_time())}ms", 0, 20, 20, pr.DARKGREEN)
+        pr.draw_text(f"PROJECTILES:{len(self.projectiles)}", 0, 40, 20, pr.DARKGREEN)
         pr.draw_line_v(
             pr.Vector2(0, self.height // 2),
             pr.Vector2(self.width, self.height // 2),

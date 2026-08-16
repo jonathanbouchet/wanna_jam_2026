@@ -21,7 +21,12 @@ class Entity:
         self.outer_color = outer_color
 
     def update(self) -> None:
-        pass
+        self.check_guard()
+
+    def check_guard(self) -> None:
+        if self.outer_radius >= self.guard_inner_radius:
+            self.inner_color = pr.RED
+            self.outer_color = pr.PINK
 
     def draw(self) -> None:
         pr.draw_ring(
@@ -46,5 +51,5 @@ class Entity:
                 start,
                 start + 30,
                 50,
-                pr.RAYWHITE,
+                pr.YELLOW,
             )
