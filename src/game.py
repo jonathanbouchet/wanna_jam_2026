@@ -30,7 +30,7 @@ class Game:
             inner_radius=50,
             outer_radius=70,
             guard_inner_radius=300,
-            guard_outer_radius=305,
+            guard_outer_radius=302,
             inner_color=pr.BLUE,
             outer_color=pr.DARKBLUE,
         )
@@ -59,7 +59,7 @@ class Game:
         self.check_collisions()
 
         # update entity
-        self.entity.update()
+        self.entity.update(dt=dt)
 
         # update projectiles
         _ = [proj.update(dt) for proj in self.projectiles if not proj.is_disabled]

@@ -1,4 +1,5 @@
 import pyray as pr
+from src.shield import Shield
 
 
 class Entity:
@@ -19,8 +20,17 @@ class Entity:
         self.guard_outer_radius = guard_outer_radius
         self.inner_color = inner_color
         self.outer_color = outer_color
+        self.shield = Shield(
+            position=pr.Vector2(self.position.x, self.position.y - self.outer_radius - 10), 
+            width=100, 
+            height=10, 
+            color=pr.PURPLE, 
+            entity_position=self.position,
+            radius = 100
+        )
 
-    def update(self) -> None:
+    def update(self, dt: float) -> None:
+        self.shield.update(dt=dt)
         self.check_guard()
 
     def check_guard(self) -> None:
@@ -40,6 +50,7 @@ class Entity:
         )
         pr.draw_circle_v(self.position, self.inner_radius, self.inner_color)
         self.draw_guard_radius()
+        self.shield.draw()
 
     def draw_guard_radius(self) -> None:
         for i in range(9):
