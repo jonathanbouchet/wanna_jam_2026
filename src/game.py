@@ -41,6 +41,7 @@ class Game:
         for proj in self.projectiles:
             proj_rect = proj.get_rectangle()
             shield_rect = self.entity.get_shield().get_rectangle()
+
             proj_polygon = PolygonCollision.shape.Shape(
                 vertices=[tuple([r.x, r.y]) for r in proj_rect]
             )
@@ -51,6 +52,7 @@ class Game:
                 print(f"COLLISION between :{proj_polygon} and {shield_polygon}")
                 proj.direction.x *= -1
                 proj.direction.y *= -1
+                break
 
     def check_collisions(self) -> None:
         for proj in self.projectiles:
