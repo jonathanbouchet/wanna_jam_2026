@@ -1,0 +1,27 @@
+{
+    "game":
+    {
+        "width": 800,
+        "height": 800,
+        "fps": 60,
+        "background_color": [0, 0, 28, 255],
+        "name": "wannajam",
+        "debug": true
+    },
+    "entity":
+    {
+        "inner_radius": 50,
+        "outer_radius": 70,
+        "guard_inner_radius":300,
+        "guard_outer_radius":302,
+        "inner_color": [0, 0, 255, 255],
+        "outer_color": [0, 82, 172, 255]
+    },
+    "projectile":
+    {
+        "direction": [-1, 1],
+        "speed": [300, 500],
+        "radius": [15, 20],
+        "color": [80, 80, 80, 255]
+    }
+}

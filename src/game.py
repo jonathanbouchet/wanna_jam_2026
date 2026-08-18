@@ -4,36 +4,35 @@ import PolygonCollision
 
 import pyray as pr
 
+from .resource_manager import ResourceManager
 from src.entity import Entity
 from src.projectile import Projectile
 
 
 class Game:
-    def __init__(
-        self,
-        width: int,
-        height: int,
-        fps_target: int,
-        name: str,
-        background_color: pr.Color,
-    ):
-        self.width = width
-        self.height = height
-        self.fps_target = fps_target
-        self.name = name
-        self.background_color = background_color
+    def __init__(self, resources_manager) -> None:
+        self.resources_manager: ResourceManager = resources_manager
+        self.width: int = self.resources_manager.game_data().get("width")
+        self.height: int = self.resources_manager.game_data().get("height")
+        self.fps_target: int = self.resources_manager.game_data().get("fps")
+        self.background_color: pr.Color = tuple(
+            self.resources_manager.game_data().get("background_color")
+        )
+        self.name: str = self.resources_manager.game_data().get("name")
+        self.debug: bool = self.resources_manager.game_data().get("debug")
+        self.projectile_data = self.resources_manager.projectile()
 
     def init(self):
         pr.init_window(self.width, self.height, self.name)
         pr.set_target_fps(self.fps_target)
         self.entity = Entity(
             position=pr.Vector2(self.width // 2, self.height // 2),
-            inner_radius=50,
-            outer_radius=70,
-            guard_inner_radius=300,
-            guard_outer_radius=302,
-            inner_color=pr.BLUE,
-            outer_color=pr.DARKBLUE,
+            inner_radius=self.resources_manager.entity().get("inner_radius"),
+            outer_radius=self.resources_manager.entity().get("outer_radius"),
+            guard_inner_radius=self.resources_manager.entity().get("guard_inner_radius"),
+            guard_outer_radius=self.resources_manager.entity().get("guard_outer_radius"),
+            inner_color=self.resources_manager.entity().get("inner_color"),
+            outer_color=self.resources_manager.entity().get("outer_color"),
         )
         self.projectiles: list[Projectile] = []
 
@@ -86,16 +85,16 @@ class Game:
     async def run(self) -> None:
         while not pr.window_should_close():
             if pr.is_mouse_button_pressed(pr.MOUSE_BUTTON_LEFT):
-                player_pos: pr.Vector2 = pr.get_mouse_position()
+                mouse_pos: pr.Vector2 = pr.get_mouse_position()
                 self.projectiles.append(
                     Projectile(
-                        position=player_pos,  # instantiate the ring where the mouse is clicked
+                        position=mouse_pos,  # instantiate the ring where the mouse is clicked
                         direction=pr.Vector2(
-                            random.uniform(-1, 1), random.uniform(-1, 1)
-                        ),  # random direction
-                        speed=random.randint(400, 600),  # random speed in [400, 600]
-                        radius=random.randint(10, 15),  # random radius
-                        color=pr.DARKGRAY,  # random color
+                            random.uniform(self.projectile_data.get("direction")[0], self.projectile_data.get("direction")[1]), 
+                            random.uniform(self.projectile_data.get("direction")[0], self.projectile_data.get("direction")[1])),  
+                        speed=random.randint(self.projectile_data.get("speed")[0], self.projectile_data.get("speed")[1]),  # random speed in [400, 600]
+                        radius=random.randint(self.projectile_data.get("radius")[0], self.projectile_data.get("radius")[1]),  # random radius
+                        color=self.projectile_data.get("color"),
                         game_window=pr.Vector2(self.width, self.height),
                     )
                 )
