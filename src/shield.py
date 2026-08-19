@@ -13,6 +13,7 @@ class Shield:
         color: pr.Color,
         entity_position,
         radius: int,
+        angular_speed: float,
     ) -> None:
         self.position = position  # position of the outer radius
         self.width = width
@@ -20,9 +21,8 @@ class Shield:
         self.color = color
         self.direction = pr.Vector2(1, 0)
         self.entity_position = entity_position
-        self.speed = 200
         self.radius = radius
-        self.angular_speed = 4.0
+        self.angular_speed = angular_speed
         self.angle = 0.0
 
     def update(self, dt: float) -> None:
@@ -106,4 +106,4 @@ class Shield:
         return [tl, tr, br, bl]
 
     def update_radius(self, outer_radius: int) -> None:
-        self.radius = outer_radius + 10
+        self.radius = outer_radius

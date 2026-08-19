@@ -23,6 +23,18 @@ class Game:
         self.name: str = self.resources_manager.game_data().get("name")
         self.debug: bool = self.resources_manager.game_data().get("debug")
         self.frame_counter: int = 0
+        self.r1: int = range(
+            self.resources_manager.projectile().get("spawn_min")[0],
+            self.resources_manager.projectile().get("spawn_min")[1],
+        )
+        self.r2: int = range(
+            self.width - self.resources_manager.projectile().get("spawn_max")[0],
+            self.width - self.resources_manager.projectile().get("spawn_max")[1],
+        )
+        self.r3: int = range(
+            self.height - self.resources_manager.projectile().get("spawn_max")[0],
+            self.height - self.resources_manager.projectile().get("spawn_max")[1],
+        )
         # entity
         self.entity = Entity(
             position=pr.Vector2(self.width // 2, self.height // 2),
@@ -36,8 +48,18 @@ class Game:
             ),
             inner_color=self.resources_manager.entity().get("inner_color"),
             outer_color=self.resources_manager.entity().get("outer_color"),
+            shield_dimension=pr.Vector2(
+                self.resources_manager.entity().get("shield_dimension")[0],
+                self.resources_manager.entity().get("shield_dimension")[1],
+            ),
+            shield_angular_speed=self.resources_manager.entity().get(
+                "shield_angular_speed"
+            ),
+            shield_position_offset=self.resources_manager.entity().get(
+                "shield_position_offset"
+            ),
         )
-        self.entity_scale_factor = 2
+        self.entity_scale_factor = self.resources_manager.entity().get("growth_factor")
         # projectiles
         self.projectiles: list[Projectile] = []
         self.projectile_data = self.resources_manager.projectile()
@@ -49,12 +71,9 @@ class Game:
         )
 
     def create_projectiles_wave(self) -> None:
-        r1 = range(40, 50)
-        r2 = range(self.width - 60, self.width - 40)
-        r3 = range(self.height - 60, self.height - 40)
         pos = pr.Vector2(
-            random.choice(list(itertools.chain(r1, r2))),
-            random.choice(list(itertools.chain(r1, r3))),
+            random.choice(list(itertools.chain(self.r1, self.r2))),
+            random.choice(list(itertools.chain(self.r1, self.r3))),
         )
         print(f"creating projectile at : [{pos.x}, {pos.y}]")
         self.projectiles.append(
@@ -73,11 +92,11 @@ class Game:
                 speed=random.randint(
                     self.projectile_data.get("speed")[0],
                     self.projectile_data.get("speed")[1],
-                ),  # random speed in [400, 600]
+                ),
                 radius=random.randint(
                     self.projectile_data.get("radius")[0],
                     self.projectile_data.get("radius")[1],
-                ),  # random radius
+                ),
                 color=self.projectile_data.get("color"),
                 game_window=pr.Vector2(self.width, self.height),
             )

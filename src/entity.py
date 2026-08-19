@@ -12,6 +12,9 @@ class Entity:
         guard_outer_radius: int,
         inner_color: pr.Color,
         outer_color: pr.Color,
+        shield_dimension: pr.Vector2,
+        shield_angular_speed: float,
+        shield_position_offset: int,
     ) -> None:
         self.position = position
         self.inner_radius = inner_radius
@@ -20,15 +23,20 @@ class Entity:
         self.guard_outer_radius = guard_outer_radius
         self.inner_color = inner_color
         self.outer_color = outer_color
+        self.shield_dimension = shield_dimension
+        self.shield_angular_speed = shield_angular_speed
+        self.shield_position_offset = shield_position_offset
         self.shield = Shield(
             position=pr.Vector2(
-                self.position.x, self.position.y - self.outer_radius - 10
+                self.position.x,
+                self.position.y - self.outer_radius - self.shield_position_offset,
             ),
-            width=100,
-            height=10,
+            width=self.shield_dimension.x,
+            height=self.shield_dimension.y,
             color=pr.PURPLE,
             entity_position=self.position,
-            radius=self.outer_radius + 10,
+            radius=self.outer_radius + self.shield_position_offset,
+            angular_speed=self.shield_angular_speed,
         )
 
     def get_shield(self) -> Shield:
@@ -73,11 +81,4 @@ class Entity:
     def update_position(self, scale_factor, projectile_radius: int) -> None:
         self.inner_radius += scale_factor * projectile_radius
         self.outer_radius += scale_factor * projectile_radius
-        self.shield.update_radius(outer_radius=self.outer_radius)
-
-    def update_shield_position(self) -> None:
-        """
-        - this happens when a projectile has been absorbed
-        - need to update the position/ radius of the shiled accordingly
-        """
-        self.shield.update_radius(outer_radius=self.outer_radius)
+        self.shield.update_radius(outer_radius=self.outer_radius + self.position_offset)
