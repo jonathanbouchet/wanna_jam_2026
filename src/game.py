@@ -4,11 +4,13 @@ import itertools
 import PolygonCollision
 
 import pyray as pr
+import raylib as rl
 
 from .resource_manager import ResourceManager
 from src.entity import Entity
 from src.projectile import Projectile
 from .timer import Timer
+from .states import GameStates
 
 
 class Game:
@@ -70,6 +72,7 @@ class Game:
             func=self.create_projectiles_wave,
         )
 
+
     def create_projectiles_wave(self) -> None:
         pos = pr.Vector2(
             random.choice(list(itertools.chain(self.r1, self.r2))),
@@ -103,6 +106,7 @@ class Game:
         )
 
     def init(self):
+        self.state = GameStates.INIT
         pr.init_window(self.width, self.height, self.name)
         pr.set_target_fps(self.fps_target)
         self.projectiles_wave_timer.activate()
@@ -160,8 +164,13 @@ class Game:
 
     async def run(self) -> None:
         while not pr.window_should_close():
-            self.update()
-            self.draw()
+            if self.state == GameStates.RUN:
+                self.update()
+                self.draw()
+            elif self.state == GameStates.INIT:
+                self.draw_init()
+            else:
+                pass
             await asyncio.sleep(0)
 
     def draw(self) -> None:
@@ -191,6 +200,20 @@ class Game:
             pr.Vector2(self.width // 2, self.height),
             pr.GREEN,
         )
+        pr.end_drawing()
+
+    def draw_init(self) -> None:
+        pr.begin_drawing()
+        pr.clear_background(self.background_color)
+        enter_triggered = pr.is_key_pressed(rl.KEY_ENTER)
+        if (
+            pr.gui_button(
+                pr.Rectangle(self.width / 2 - 250, self.height / 2 - 20, 500, 80),
+                "<INSERT GAME TITLE>",
+            )
+            or enter_triggered
+        ):
+            self.state = GameStates.RUN
         pr.end_drawing()
 
     def end(self) -> None:
