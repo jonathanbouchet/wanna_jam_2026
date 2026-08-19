@@ -46,10 +46,34 @@ class Projectile:
     def draw(self):
         pr.draw_circle_v(self.position, self.radius, self.color)
         coords = self.get_rectangle()
-        pr.draw_line(int(coords[0].x), int(coords[0].y), int(coords[1].x), int(coords[1].y), pr.RED)
-        pr.draw_line(int(coords[1].x), int(coords[1].y), int(coords[2].x), int(coords[2].y), pr.RED)
-        pr.draw_line(int(coords[2].x), int(coords[2].y), int(coords[3].x), int(coords[3].y), pr.RED)
-        pr.draw_line(int(coords[3].x), int(coords[3].y), int(coords[0].x), int(coords[0].y), pr.RED)
+        pr.draw_line(
+            int(coords[0].x),
+            int(coords[0].y),
+            int(coords[1].x),
+            int(coords[1].y),
+            pr.RED,
+        )
+        pr.draw_line(
+            int(coords[1].x),
+            int(coords[1].y),
+            int(coords[2].x),
+            int(coords[2].y),
+            pr.RED,
+        )
+        pr.draw_line(
+            int(coords[2].x),
+            int(coords[2].y),
+            int(coords[3].x),
+            int(coords[3].y),
+            pr.RED,
+        )
+        pr.draw_line(
+            int(coords[3].x),
+            int(coords[3].y),
+            int(coords[0].x),
+            int(coords[0].y),
+            pr.RED,
+        )
 
     def get_rectangle(self) -> list[pr.Vector2]:
         # make a pr.Rectangle based on the projectile radius

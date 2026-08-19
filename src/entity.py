@@ -21,12 +21,14 @@ class Entity:
         self.inner_color = inner_color
         self.outer_color = outer_color
         self.shield = Shield(
-            position=pr.Vector2(self.position.x, self.position.y - self.outer_radius - 10), 
-            width=100, 
-            height=10, 
-            color=pr.PURPLE, 
+            position=pr.Vector2(
+                self.position.x, self.position.y - self.outer_radius - 10
+            ),
+            width=100,
+            height=10,
+            color=pr.PURPLE,
             entity_position=self.position,
-            radius = 100
+            radius=self.outer_radius + 10,
         )
 
     def get_shield(self) -> Shield:
@@ -67,3 +69,15 @@ class Entity:
                 50,
                 pr.YELLOW,
             )
+
+    def update_position(self, scale_factor, projectile_radius: int) -> None:
+        self.inner_radius += scale_factor * projectile_radius
+        self.outer_radius += scale_factor * projectile_radius
+        self.shield.update_radius(outer_radius=self.outer_radius)
+
+    def update_shield_position(self) -> None:
+        """
+        - this happens when a projectile has been absorbed
+        - need to update the position/ radius of the shiled accordingly
+        """
+        self.shield.update_radius(outer_radius=self.outer_radius)
