@@ -1,16 +1,20 @@
 import asyncio
-import random
 import itertools
+import random
+from pathlib import Path
+
 import PolygonCollision
-
 import pyray as pr
-import raylib as rl
 
-from .resource_manager import ResourceManager
 from src.entity import Entity
 from src.projectile import Projectile
-from .timer import Timer
-from .states import GameStates
+
+from src.button import Button
+from src.resource_manager import ResourceManager
+from src.states import GameStates
+from src.timer import Timer
+
+THIS_DIR = (Path(__file__).parent.parent / "assets").resolve()
 
 
 class Game:
@@ -24,6 +28,23 @@ class Game:
         )
         self.name: str = self.resources_manager.game_data().get("name")
         self.debug: bool = self.resources_manager.game_data().get("debug")
+
+        # do the init right away
+        self.state = GameStates.INIT
+        pr.init_window(self.width, self.height, self.name)
+        pr.set_target_fps(self.fps_target)
+        self.font = pr.load_font(
+            f"{THIS_DIR}/{self.resources_manager.game_data().get('font')}"
+        )
+        self.start_button = Button(
+            position=pr.Vector2(self.width / 2 - 100, self.height / 2),
+            size=pr.Vector2(200, 100),
+            text="START",
+            font=self.font,
+            font_size=100,
+            font_color=pr.DARKGRAY,
+        )
+
         self.frame_counter: int = 0
         self.r1: int = range(
             self.resources_manager.projectile().get("spawn_min")[0],
@@ -71,7 +92,7 @@ class Game:
             autostart=True,
             func=self.create_projectiles_wave,
         )
-
+        self.projectiles_wave_timer.activate()
 
     def create_projectiles_wave(self) -> None:
         pos = pr.Vector2(
@@ -104,12 +125,6 @@ class Game:
                 game_window=pr.Vector2(self.width, self.height),
             )
         )
-
-    def init(self):
-        self.state = GameStates.INIT
-        pr.init_window(self.width, self.height, self.name)
-        pr.set_target_fps(self.fps_target)
-        self.projectiles_wave_timer.activate()
 
     def check_collisions_projectiles_shield(self) -> None:
         for proj in self.projectiles:
@@ -164,6 +179,9 @@ class Game:
 
     async def run(self) -> None:
         while not pr.window_should_close():
+            self.start_button.update()
+            if self.start_button.has_been_clicked():
+                self.state = GameStates.RUN
             if self.state == GameStates.RUN:
                 self.update()
                 self.draw()
@@ -205,15 +223,10 @@ class Game:
     def draw_init(self) -> None:
         pr.begin_drawing()
         pr.clear_background(self.background_color)
-        enter_triggered = pr.is_key_pressed(rl.KEY_ENTER)
-        if (
-            pr.gui_button(
-                pr.Rectangle(self.width / 2 - 250, self.height / 2 - 20, 500, 80),
-                "<INSERT GAME TITLE>",
-            )
-            or enter_triggered
-        ):
-            self.state = GameStates.RUN
+        pr.draw_text_ex(
+            self.font, "INSERT GAME TITLE", pr.Vector2(100, 170), 100, 2, pr.GRAY
+        )
+        self.start_button.draw()
         pr.end_drawing()
 
     def end(self) -> None:

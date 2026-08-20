@@ -1,4 +1,5 @@
 import pyray as pr
+
 from src.shield import Shield
 
 
@@ -81,4 +82,6 @@ class Entity:
     def update_position(self, scale_factor, projectile_radius: int) -> None:
         self.inner_radius += scale_factor * projectile_radius
         self.outer_radius += scale_factor * projectile_radius
-        self.shield.update_radius(outer_radius=self.outer_radius + self.shield_position_offset)
+        self.shield.update_radius(
+            outer_radius=self.outer_radius + self.shield_position_offset
+        )

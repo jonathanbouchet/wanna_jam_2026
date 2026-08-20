@@ -26,7 +26,7 @@ THEME: `UNSTABLE`
 <img src="images/day_11.png" alt="" width="300">
 
 ### TO DO:
-- [ ] add collision detection between the shield and the neutrons: `+++`
+- [ x ] add collision detection between the shield and the neutrons: `+++`
 - [ ] replace assets with pixel arts: `++`
 - [ ] add sound effects: `+`
 - [ ] add some sort of scoring: `+++`

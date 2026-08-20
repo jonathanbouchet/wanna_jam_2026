@@ -1,4 +1,5 @@
 from typing import Any
+
 import pyray as pr
 
 
@@ -39,9 +40,7 @@ class Timer:
             self.activate()
 
     def update(self) -> None:
-        if self.active:
-            if pr.get_time() - self.start_time >= self.duration:
-                if self.func:
-                    # if self.func and self.start_time:
-                    self.func()
-                self.deactivate()
+        if self.active and pr.get_time() - self.start_time >= self.duration:
+            if self.func:
+                self.func()
+            self.deactivate()

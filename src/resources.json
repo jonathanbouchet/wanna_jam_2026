@@ -6,7 +6,8 @@
         "fps": 60,
         "background_color": [0, 0, 28, 255],
         "name": "wannajam",
-        "debug": true
+        "debug": true,
+        "font": "Thin Sans.ttf"
     },
     "entity":
     {
