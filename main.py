@@ -10,7 +10,6 @@ THIS_DIR = (Path(__file__).parent / "src").resolve()
 async def main() -> None:
     resources_manager = ResourceManager(resources_path=f"{THIS_DIR}/resources.json")
     game = Game(resources_manager=resources_manager)
-    # game.init()
     await game.run()
     game.end()
 

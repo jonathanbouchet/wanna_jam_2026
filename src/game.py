@@ -182,7 +182,6 @@ class Game:
             self.start_button.update()
             if self.start_button.has_been_clicked():
                 self.state = GameStates.RUN
-            if self.state == GameStates.RUN:
                 self.update()
                 self.draw()
             elif self.state == GameStates.INIT:
