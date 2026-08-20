@@ -37,12 +37,13 @@ class Game:
             f"{THIS_DIR}/{self.resources_manager.game_data().get('font')}"
         )
         self.start_button = Button(
-            position=pr.Vector2(self.width / 2 - 100, self.height / 2),
-            size=pr.Vector2(200, 100),
-            text="START",
+            position=pr.Vector2(self.width / 2 - 150, self.height / 2),
+            size=pr.Vector2(275, 100),
+            text="READ ME",
             font=self.font,
             font_size=100,
-            font_color=pr.DARKGRAY,
+            font_color=pr.RAYWHITE,
+            font_highlight_color=pr.GREEN
         )
 
         self.frame_counter: int = 0
@@ -223,7 +224,10 @@ class Game:
         pr.begin_drawing()
         pr.clear_background(self.background_color)
         pr.draw_text_ex(
-            self.font, "INSERT GAME TITLE", pr.Vector2(100, 170), 100, 2, pr.GRAY
+            self.font, "DON'T GET TOO EXCITED", pr.Vector2(50, 170), 100, 2, pr.RAYWHITE
+        )
+        pr.draw_text_ex(
+            self.font, "v0.1, 1986", pr.Vector2(700, 750), 20, 2, pr.RAYWHITE
         )
         self.start_button.draw()
         pr.end_drawing()

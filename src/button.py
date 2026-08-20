@@ -10,6 +10,7 @@ class Button:
         font: pr.Font,
         font_size: int,
         font_color: pr.Color,
+        font_highlight_color: pr.Color
     ) -> None:
         self.position = position
         self.size = size
@@ -21,23 +22,27 @@ class Button:
         self.font = font
         self.font_size = font_size
         self.font_color = font_color
+        self.highlighted_color = font_highlight_color
+        self.current_color = self.font_color
         self.is_clicked = False
 
     def draw(self) -> None:
         pr.draw_text_ex(
-            self.font, self.text, self.position, self.font_size, 2, self.font_color
+            self.font, self.text, self.position, self.font_size, 2, self.current_color
         )
         pr.draw_rectangle_lines_ex(self.rect, 1, pr.RED)
 
     def update(self) -> None:
-        if pr.check_collision_point_rec(
-            pr.get_mouse_position(), self.rect
-        ) and pr.is_mouse_button_pressed(0):
-            print(
-                f"{pr.check_collision_point_rec(pr.get_mouse_position(), self.rect)}, {pr.is_mouse_button_pressed(0)}"
-            )
-            self.state_changed = not self.state_changed
-            self.is_clicked = True
+        if pr.check_collision_point_rec(pr.get_mouse_position(), self.rect):
+            self.current_color = self.highlighted_color
+            if pr.is_mouse_button_pressed(0):
+                print(
+                    f"{pr.check_collision_point_rec(pr.get_mouse_position(), self.rect)}, {pr.is_mouse_button_pressed(0)}"
+                )
+                self.state_changed = not self.state_changed
+                self.is_clicked = True
+        else:
+            self.current_color = self.font_color
 
     def has_been_clicked(self) -> bool:
         return self.is_clicked
