@@ -8,6 +8,7 @@ import pyray as pr
 
 from src.entity import Entity
 from src.projectile import Projectile
+from src.decay import Decay
 
 from src.button import Button
 from src.resource_manager import ResourceManager
@@ -36,10 +37,11 @@ class Game:
         self.font = pr.load_font(
             f"{THIS_DIR}/{self.resources_manager.game_data().get('font')}"
         )
-        self.start_button = Button(
-            position=pr.Vector2(self.width / 2 - 150, self.height / 2),
-            size=pr.Vector2(275, 100),
-            text="READ ME",
+
+        self.start_game_button = Button(
+            position=pr.Vector2(self.width / 2 - 100, self.height / 2),
+            size=pr.Vector2(200, 100),
+            text="START",
             font=self.font,
             font_size=100,
             font_color=pr.RAYWHITE,
@@ -90,10 +92,10 @@ class Game:
         self.projectiles_wave_timer = Timer(
             duration=2,
             repeat=True,
-            autostart=True,
+            autostart=False,
             func=self.create_projectiles_wave,
         )
-        self.projectiles_wave_timer.activate()
+        self.decays: list[Decay] = []
 
     def create_projectiles_wave(self) -> None:
         pos = pr.Vector2(
@@ -144,6 +146,29 @@ class Game:
                 proj.direction.y *= -1
                 break
 
+    def check_projectiles_status(self) -> list[Projectile]:
+        """
+        - if projectile is disabled, create remnant at that point
+        - returns only projectile not disabled
+        """
+        projectiles_not_disabled: list[Projectile] = []
+        for projectile in self.projectiles:
+            if not projectile.is_disabled:
+                projectiles_not_disabled.append(projectile)
+            else:
+                # create remnant now
+                self.decays.append(
+                    Decay(
+                        position=projectile.position,
+                        max_size=pr.Vector2(10, 20),
+                        children=3,
+                        speed=projectile.speed,
+                        lifetime=4,
+                        color=projectile.color
+                    )
+                )
+        return projectiles_not_disabled
+
     def check_collisions_projectiles_guard(self) -> None:
         for proj in self.projectiles:
             if pr.check_collision_circles(
@@ -157,8 +182,9 @@ class Game:
                     scale_factor=self.entity_scale_factor, projectile_radius=proj.radius
                 )
                 proj.is_disabled = True
-                break
-        self.projectiles = [proj for proj in self.projectiles if not proj.is_disabled]
+                # break
+        # self.projectiles = [proj for proj in self.projectiles if not proj.is_disabled]
+        self.projectiles = self.check_projectiles_status()
 
     def update(self) -> None:
         self.frame_counter += 1
@@ -175,27 +201,38 @@ class Game:
         # update projectiles
         _ = [proj.update(dt) for proj in self.projectiles if not proj.is_disabled]
 
+        # update decays
+        _ = [decay.update(dt=dt) for decay in self.decays]
+
         # update wave timer
         self.projectiles_wave_timer.update()
 
     async def run(self) -> None:
         while not pr.window_should_close():
-            self.start_button.update()
-            if self.start_button.has_been_clicked():
+            self.update()
+            self.start_game_button.update()
+
+            if self.start_game_button.has_been_clicked():
                 self.state = GameStates.RUN
-                self.update()
-                self.draw()
-            elif self.state == GameStates.INIT:
-                self.draw_init()
+                if not self.projectiles_wave_timer.active:
+                    self.projectiles_wave_timer.activate() # only start the wave when the game starts
             else:
-                pass
+                self.state == GameStates.INIT
+
+            match self.state:
+                case GameStates.INIT:
+                    self.draw_init()
+                case GameStates.RUN:
+                    self.draw()
+                case _:
+                    pass
+            self.draw_blanck()
             await asyncio.sleep(0)
 
     def draw(self) -> None:
-        pr.begin_drawing()
-        pr.clear_background(self.background_color)
         self.entity.draw()
         _ = [proj.draw() for proj in self.projectiles if not proj.is_disabled]
+        _ = [decay.draw() for decay in self.decays]
         pr.draw_fps(0, 0)
         pr.draw_text(
             f"FRAME TIME: {int(1000 * pr.get_frame_time())}ms", 0, 20, 20, pr.GREEN
@@ -208,6 +245,7 @@ class Game:
             20,
             pr.GREEN,
         )
+        pr.draw_text(f"{self.state!s}", 0, 80, 20, pr.GREEN)
         pr.draw_line_v(
             pr.Vector2(0, self.height // 2),
             pr.Vector2(self.width, self.height // 2),
@@ -218,19 +256,59 @@ class Game:
             pr.Vector2(self.width // 2, self.height),
             pr.GREEN,
         )
-        pr.end_drawing()
 
     def draw_init(self) -> None:
-        pr.begin_drawing()
-        pr.clear_background(self.background_color)
         pr.draw_text_ex(
             self.font, "DON'T GET TOO EXCITED", pr.Vector2(50, 170), 100, 2, pr.RAYWHITE
         )
         pr.draw_text_ex(
             self.font, "v0.1, 1986", pr.Vector2(700, 750), 20, 2, pr.RAYWHITE
         )
-        self.start_button.draw()
+        self.start_game_button.draw()
+
+        pr.draw_fps(0, 0)
+        pr.draw_text(
+            f"FRAME TIME: {int(1000 * pr.get_frame_time())}ms", 0, 20, 20, pr.GREEN
+        )
+        pr.draw_text(f"PROJECTILES: {len(self.projectiles)}", 0, 40, 20, pr.GREEN)
+        pr.draw_text(
+            f"TIME: {int(pr.get_time())!s}, FRAMES: {self.frame_counter}",
+            0,
+            60,
+            20,
+            pr.GREEN,
+        )
+        pr.draw_text(f"{self.state!s}", 0, 80, 20, pr.GREEN)
+
+
+    # def draw_readme(self) -> None:
+    #     pr.draw_text_ex(
+    #         self.font, "- GOAL: avoid the nuclear fission by protecting \nthe core Uranium from fast neutrons", pr.Vector2(50, 170), 50, 2, pr.RAYWHITE
+    #     )
+    #     pr.draw_text_ex(
+    #         self.font, "v0.1, 1986", pr.Vector2(700, 750), 20, 2, pr.RAYWHITE
+    #     )
+    #     self.start_game_button.draw()
+    #     pr.draw_fps(0, 0)
+    #     pr.draw_text(
+    #         f"FRAME TIME: {int(1000 * pr.get_frame_time())}ms", 0, 20, 20, pr.GREEN
+    #     )
+    #     pr.draw_text(f"PROJECTILES: {len(self.projectiles)}", 0, 40, 20, pr.GREEN)
+    #     pr.draw_text(
+    #         f"TIME: {int(pr.get_time())!s}, FRAMES: {self.frame_counter}",
+    #         0,
+    #         60,
+    #         20,
+    #         pr.GREEN,
+    #     )
+    #     pr.draw_text(f"{self.state!s}", 0, 80, 20, pr.GREEN)
+
+
+    def draw_blanck(self) -> None:
+        pr.begin_drawing()
+        pr.clear_background(self.background_color)
         pr.end_drawing()
+
 
     def end(self) -> None:
         pr.close_window()

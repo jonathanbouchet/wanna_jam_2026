@@ -20,6 +20,7 @@ class Timer:
         )
         self.func = func  # function that is to be repeated
         self.active = False  # flag to denote the function is running
+        self.start_time = 0
 
         if self.autostart:
             self.activate()
@@ -31,6 +32,7 @@ class Timer:
         """active only live until current time < duration"""
         self.active = True
         self.start_time = pr.get_time()
+        print(f"setting {self.start_time=}")
 
     def deactivate(self) -> None:
         """deactivate the timer"""

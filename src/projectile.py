@@ -21,6 +21,8 @@ class Projectile:
         self.game_window = game_window
         self.is_disabled = False
         self.angle = 0
+        self.duration = 2
+        self.start_time = pr.get_time()
 
     def move(self, dt: float) -> None:
         """
@@ -42,6 +44,9 @@ class Projectile:
         self.position.y += self.direction.y * self.speed * dt
 
     def update(self, dt):
+        # add a duration effect, i.e after duration, the projectile disappear
+        if pr.get_time() - self.start_time > self.duration:
+            self.is_disabled = True
         self.move(dt)
 
     def draw(self):

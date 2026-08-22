@@ -37,7 +37,7 @@ class Button:
             self.current_color = self.highlighted_color
             if pr.is_mouse_button_pressed(0):
                 print(
-                    f"{pr.check_collision_point_rec(pr.get_mouse_position(), self.rect)}, {pr.is_mouse_button_pressed(0)}"
+                    f"{self.text}, {pr.check_collision_point_rec(pr.get_mouse_position(), self.rect)}, {pr.is_mouse_button_pressed(0)}"
                 )
                 self.state_changed = not self.state_changed
                 self.is_clicked = True

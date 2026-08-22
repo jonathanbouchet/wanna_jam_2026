@@ -6,3 +6,4 @@ class GameStates(Enum):
     RUN = 1  # game is running
     PAUSE = 2  # game is paused
     OVER = 3  # game is over
+    README = 4
